@@ -61,11 +61,11 @@ Read the user invention description below and perform:
 3) 3–5 high-level technology categories/domains.
 
 Return ONLY valid JSON with this exact schema:
-{
+{{
   "summary": "<string>",
   "keywords": ["<string>", ...],
   "categories": ["<string>", ...]
-}
+}}
 
 USER_IDEA:
 {idea}
@@ -97,21 +97,21 @@ PRIOR_PATENTS_TEXT:
 {patent_snippets}
 
 Return ONLY valid JSON with this schema:
-{
+{{
   "per_patent_analysis": [
-    {
+    {{
       "patent_label": "<e.g. PATENT_1>",
       "patent_id": "<string>",
       "similarity": "<low|medium|high>",
       "overlapping_features": ["<string>", ...],
       "differentiating_features": ["<string>", ...],
       "notes": "<string>"
-    }
+    }}
   ],
   "overall_overlap_risk": "<low|medium|high>",
   "recommended_changes": ["<string>", ...],
   "disclaimer": "<string>"
-}
+}}
 """,
         ),
     ]

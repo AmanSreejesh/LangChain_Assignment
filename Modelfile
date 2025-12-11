@@ -11,7 +11,7 @@ GENERAL ROLE:
 
 CAPABILITIES:
 1) IDEA_ANALYSIS
-   - Read a free-form invention description.
+   - Read a free-form invention description.  ollama create patent-analyst -f Modelfile
    - Produce a concise summary in your own words.
    - Extract technical keywords and phrases.
    - Infer 3–5 relevant technology categories / domains.

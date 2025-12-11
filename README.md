@@ -53,10 +53,3 @@ Project layout
 	- `pipeline.py` — main pipeline logic and pretty-printer
 	- `cli.py` — command-line interface wrapper
 
-If you'd like, I can:
-- Add a `requirements.txt` based on imports.
-- Add a mock mode so the repo runs end-to-end without the real API key.
-- Add a simple test harness or example input file for quick experimentation.
-
----
-_If you want me to change the README wording or add extra sections (tests, CI, examples), tell me what to include and I'll update it._
