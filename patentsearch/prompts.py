@@ -1,5 +1,15 @@
 import textwrap
-from langchain_core.prompts import ChatPromptTemplate
+
+try:
+  from langchain_core.prompts import ChatPromptTemplate
+except Exception:
+  try:
+    from langchain.prompts import ChatPromptTemplate
+  except Exception:
+    raise ModuleNotFoundError(
+      "Could not import ChatPromptTemplate from langchain_core.prompts or langchain.prompts. "
+      "Install `langchain` or `langchain-core`, or adjust your PYTHONPATH."
+    )
 
 
 SYSTEM_TEXT = textwrap.dedent("""
