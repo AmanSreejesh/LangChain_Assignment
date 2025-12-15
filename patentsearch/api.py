@@ -60,9 +60,17 @@ def search_patentsearch(summary: str, keywords: List[str], size: int = 5) -> Lis
     if PATENTSEARCH_API_KEY:
         headers["X-Api-Key"] = PATENTSEARCH_API_KEY
 
+    print(f"DEBUG: API query: {q_obj}")
+    print(f"DEBUG: API params: {params}")
+
     resp = requests.get(PATENTSEARCH_PATENT_ENDPOINT, params=params, headers=headers)
     resp.raise_for_status()
     data = resp.json()
+
+    print(f"DEBUG: API response status: {resp.status_code}")
+    print(f"DEBUG: API response data keys: {list(data.keys())}")
+    if 'patents' in data:
+        print(f"DEBUG: Number of patents returned: {len(data['patents'])}")
 
     if data.get("error"):
         raise RuntimeError(f"PatentSearch API error: {data}")
