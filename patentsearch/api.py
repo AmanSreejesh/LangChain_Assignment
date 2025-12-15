@@ -10,22 +10,26 @@ from .config import PATENTSEARCH_API_KEY, PATENTSEARCH_PATENT_ENDPOINT
 def build_patentsearch_query(summary: str, keywords: List[str]) -> Dict[str, Any]:
     """
     Build a PatentSearch 'q' JSON object.
-    Restrict to patents from 2010 onward and search title/abstract.
+    Restrict to patents from 2020 onward and search title/abstract.
     """
-    keyword_phrase = " ".join(keywords) if keywords else summary
+    # Build OR conditions for each keyword in title and abstract
+    title_conditions = [{"_text_phrase": {"patent_title": kw.lower()}} for kw in keywords if kw]
+    abstract_conditions = [{"_text_phrase": {"patent_abstract": kw.lower()}} for kw in keywords if kw]
+    
+    # If no keywords, fall back to summary
+    if not title_conditions:
+        title_conditions = [{"_text_any": {"patent_title": summary}}]
+        abstract_conditions = [{"_text_any": {"patent_abstract": summary}}]
 
-    q = {
+    q_obj = {
         "_and": [
-            {"_gte": {"patent_date": "2010-01-01"}},
+            {"_gte": {"patent_date": "2020-01-01"}},
             {
-                "_or": [
-                    {"_text_any": {"patent_title": keyword_phrase}},
-                    {"_text_any": {"patent_abstract": keyword_phrase}},
-                ]
+                "_or": title_conditions + abstract_conditions
             },
         ]
     }
-    return q
+    return q_obj
 
 
 def search_patentsearch(summary: str, keywords: List[str], size: int = 5) -> List[Dict[str, Any]]:
@@ -52,13 +56,21 @@ def search_patentsearch(summary: str, keywords: List[str], size: int = 5) -> Lis
         "o": json.dumps(o_obj),
     }
 
-    headers = {
-        "X-Api-Key": PATENTSEARCH_API_KEY,
-    }
+    headers = {}
+    if PATENTSEARCH_API_KEY:
+        headers["X-Api-Key"] = PATENTSEARCH_API_KEY
+
+    print(f"DEBUG: API query: {q_obj}")
+    print(f"DEBUG: API params: {params}")
 
     resp = requests.get(PATENTSEARCH_PATENT_ENDPOINT, params=params, headers=headers)
     resp.raise_for_status()
     data = resp.json()
+
+    print(f"DEBUG: API response status: {resp.status_code}")
+    print(f"DEBUG: API response data keys: {list(data.keys())}")
+    if 'patents' in data:
+        print(f"DEBUG: Number of patents returned: {len(data['patents'])}")
 
     if data.get("error"):
         raise RuntimeError(f"PatentSearch API error: {data}")

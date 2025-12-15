@@ -63,22 +63,16 @@ idea_prompt = ChatPromptTemplate.from_messages(
         (
             "human",
             """
-You are in mode: IDEA_ANALYSIS.
+Analyze the invention: Provide a short summary, 5-7 keywords, and 3 categories.
 
-Read the user invention description below and perform:
-1) A concise neutral summary (max 200 words).
-2) A list of 5–15 technical keywords/phrases.
-3) 3–5 high-level technology categories/domains.
-
-Return ONLY valid JSON with this exact schema:
+Return ONLY JSON:
 {{
-  "summary": "<string>",
-  "keywords": ["<string>", ...],
-  "categories": ["<string>", ...]
+  "summary": "short summary",
+  "keywords": ["kw1", "kw2"],
+  "categories": ["cat1", "cat2"]
 }}
 
-USER_IDEA:
-{idea}
+Invention: {idea}
 """,
         ),
     ]
@@ -92,36 +86,20 @@ compare_prompt = ChatPromptTemplate.from_messages(
         (
             "human",
             """
-You are in mode: PRIOR_ART_COMPARISON.
+Compare invention to patents. Return JSON only.
 
-You will:
-- Compare the user's invention with provided prior patents.
-- Highlight overlapping and differentiating features.
-- Suggest changes to improve distinctiveness.
-- This is NOT legal advice and you must say so in the disclaimer.
-
-USER_INVENTION_SUMMARY:
-{idea_summary}
-
-PRIOR_PATENTS_TEXT:
-{patent_snippets}
-
-Return ONLY valid JSON with this schema:
 {{
   "per_patent_analysis": [
-    {{
-      "patent_label": "<e.g. PATENT_1>",
-      "patent_id": "<string>",
-      "similarity": "<low|medium|high>",
-      "overlapping_features": ["<string>", ...],
-      "differentiating_features": ["<string>", ...],
-      "notes": "<string>"
-    }}
+    {{"patent_label": "PATENT_1", "similarity": "medium", "notes": "brief"}}
   ],
-  "overall_overlap_risk": "<low|medium|high>",
-  "recommended_changes": ["<string>", ...],
-  "disclaimer": "<string>"
+  "overall_overlap_risk": "medium",
+  "recommended_changes": ["change1"],
+  "disclaimer": "Not legal advice."
 }}
+
+Invention: {idea_summary}
+
+Patents: {patent_snippets}
 """,
         ),
     ]

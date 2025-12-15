@@ -8,64 +8,7 @@ from .api import search_patentsearch, format_patents_for_llm
 
 
 def run_patentsearch_pipeline(idea_text: str) -> Dict[str, Any]:
-    # If mock mode enabled, return deterministic fixtures so the pipeline
-    # can be exercised without Ollama or network access.
-    use_mock = os.getenv("PATENTSEARCH_USE_MOCK", "0").lower() in ("1", "true", "yes")
-    if use_mock:
-        # Simple mock idea analysis
-        idea_info = {
-            "summary": (idea_text.strip()[:400] or "(no idea provided)"),
-            "keywords": [w.strip(".,") for w in idea_text.split()[:8]],
-            "categories": ["IoT", "Environmental Monitoring", "Wearables"],
-        }
-
-        # Mock patents returned by PatentSearch
-        patents = [
-            {
-                "patent_id": "US-MOCK-0001",
-                "title": "Wearable air-quality monitor with feedback",
-                "abstract": "A wearable device that measures air quality and provides feedback to the wearer.",
-                "date": "2022-05-01",
-            },
-            {
-                "patent_id": "US-MOCK-0002",
-                "title": "Adaptive breathing guidance system",
-                "abstract": "A system that suggests breathing exercises based on sensor input.",
-                "date": "2020-10-20",
-            },
-        ]
-
-        patent_snippets = format_patents_for_llm(patents)
-
-        # Mock comparison info
-        comp_info = {
-            "per_patent_analysis": [
-                {
-                    "patent_label": "PATENT_1",
-                    "patent_id": "US-MOCK-0001",
-                    "similarity": "medium",
-                    "overlapping_features": ["wearable sensor", "air quality measurement"],
-                    "differentiating_features": ["robust casing for harsh conditions"],
-                    "notes": "PATENT_1 shares sensing features but differs in durability and deployment context.",
-                },
-                {
-                    "patent_label": "PATENT_2",
-                    "patent_id": "US-MOCK-0002",
-                    "similarity": "low",
-                    "overlapping_features": ["breathing guidance"],
-                    "differentiating_features": ["hotspot connectivity features"],
-                },
-            ],
-            "overall_overlap_risk": "medium",
-            "recommended_changes": [
-                "Emphasize ruggedized power and sealed enclosure",
-                "Add low-bandwidth mesh connectivity for remote areas",
-            ],
-            "disclaimer": "This mock comparison is for demonstration only and is NOT legal advice.",
-        }
-
-        return {"idea_analysis": idea_info, "comparison": comp_info, "similar_patents": patents}
-
+    
     # Real mode: call the LLM and online PatentSearch
     llm = get_llm()
 
@@ -137,9 +80,15 @@ def run_patentsearch_pipeline(idea_text: str) -> Dict[str, Any]:
         p for p in raw_patents if keyword_overlap(p, idea_info["keywords"]) > 0
     ]
 
+    # Sort by overlap count descending
+    filtered_patents.sort(key=lambda p: keyword_overlap(p, idea_info["keywords"]), reverse=True)
+
+    # Limit to top 3 most relevant patents to avoid overwhelming the LLM
+    filtered_patents = filtered_patents[:3]
+
     # If none, fallback to the top 1-2 by default (so user sees something)
-    if not filtered_patents and raw_patents:
-        filtered_patents = raw_patents[:2]
+    # if not filtered_patents and raw_patents:
+    #     filtered_patents = raw_patents[:2]
 
     if not filtered_patents:
         return {
