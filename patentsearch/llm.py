@@ -11,7 +11,7 @@ def get_llm():
     And that an Ollama server is running and reachable (OLLAMA_HOST env if remote).
     """
     return ChatOllama(
-        model="llama3.2:3b",
+        model="patent-analyst",
         temperature=0,
         timeout=30,
     )
