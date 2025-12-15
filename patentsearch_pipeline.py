@@ -1,12 +1,7 @@
 # patentsearch_pipeline.py
 
-"""Thin entrypoint wrapper kept for compatibility with prior usage.
-
-This file delegates implementation to the `patentsearch` package so the
-codebase has a clearer structure (CLI, pipeline, API, prompts, LLM).
-
-Running `python patentsearch_pipeline.py` preserves the original CLI
-behaviour.
+"""
+This assignment uses AI (specifically the Github Copilot) in the manual coding aspect. For the parts of the assignment that includes structuring the workflow and deciding what programs to call upon (API's, etc) was decided by me. However, for the actual technical implementation, Copilot was used to assist due to the complexity of the issue. 
 """
 
 from patentsearch.cli import main
